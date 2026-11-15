@@ -1,0 +1,15 @@
+{
+  "name": "deployvera",
+  "description": "DeployVera plugins for Claude Code",
+  "owner": {
+    "name": "DeployVera",
+    "url": "https://deployvera.com"
+  },
+  "plugins": [
+    {
+      "name": "deployvera",
+      "source": "./plugins/deployvera",
+      "description": "Deploy, monitor and debug your DeployVera projects from Claude Code."
+    }
+  ]
+}
