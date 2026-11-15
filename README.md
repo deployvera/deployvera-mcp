@@ -24,7 +24,7 @@ Add the server URL without any token. The client opens your browser, you sign in
 **Claude Code**: plugin (MCP server plus the deploy skill):
 
 ```
-/plugin marketplace add yusufcelalcelik/deployvera-agent
+/plugin marketplace add deployvera/deployvera-mcp
 /plugin install deployvera@deployvera
 ```
 

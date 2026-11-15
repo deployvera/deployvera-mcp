@@ -8,7 +8,7 @@
     "url": "https://deployvera.com"
   },
   "homepage": "https://deployvera.com",
-  "repository": "https://github.com/yusufcelalcelik/deployvera-agent",
+  "repository": "https://github.com/deployvera/deployvera-mcp",
   "license": "MIT",
   "keywords": ["deployvera", "deploy", "paas", "mcp", "git-push", "hosting"]
 }
