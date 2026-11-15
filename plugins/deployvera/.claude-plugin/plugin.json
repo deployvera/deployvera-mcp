@@ -1,7 +1,7 @@
 {
   "name": "deployvera",
   "displayName": "DeployVera",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Deploy, follow builds, read logs, fix failures and manage environment variables of your existing DeployVera projects.",
   "author": {
     "name": "DeployVera",
@@ -10,5 +10,14 @@
   "homepage": "https://deployvera.com",
   "repository": "https://github.com/deployvera/deployvera-mcp",
   "license": "MIT",
-  "keywords": ["deployvera", "deploy", "paas", "mcp", "git-push", "hosting"]
+  "keywords": [
+    "deployvera",
+    "deploy",
+    "paas",
+    "mcp",
+    "git-push",
+    "hosting"
+  ],
+  "icon": ".claude-plugin/icon.png",
+  "privacyPolicyUrl": "https://deployvera.com/legal/privacy-policy"
 }
