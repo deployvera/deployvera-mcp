@@ -104,7 +104,7 @@ url = "https://mcp.deployvera.com/mcp"
 bearer_token_env_var = "DEPLOYVERA_TOKEN"
 ```
 
-**Windsurf and other clients**: any client that supports remote MCP over Streamable HTTP works. Use the URL `https://mcp.deployvera.com/mcp` and, for tokens, the header `Authorization: Bearer dvp_...`. For stdio-only clients use `npx -y @deployvera/mcp` with the `DEPLOYVERA_TOKEN` environment variable.
+**Windsurf and other clients**: any client that supports remote MCP over Streamable HTTP works. Use the URL `https://mcp.deployvera.com/mcp` and, for tokens, the header `Authorization: Bearer dvp_...`. For stdio-only clients use `npx -y deployvera-mcp` with the `DEPLOYVERA_TOKEN` environment variable.
 
 ## Tools
 
