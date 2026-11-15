@@ -2,9 +2,11 @@
 
 <img src="assets/logo.png" alt="DeployVera" width="96" align="right">
 
-Connect coding agents (Claude Code, Cursor, VS Code, Codex and any other MCP client) to your existing [DeployVera](https://deployvera.com) projects. The agent can list projects, deploy, follow builds, read logs, get a plain-language explanation of a failed build, and manage environment variables. It uses DeployVera's hosted MCP server at `https://mcp.deployvera.com/mcp` (Streamable HTTP), listed in the official MCP Registry as `com.deployvera/mcp`. This repository also contains a Claude Code plugin with a deploy workflow skill.
+Connect coding agents (Claude Code, Cursor, VS Code, Codex and any other MCP client) to your existing [DeployVera](https://deployvera.com) projects. The agent can list projects, deploy, follow builds, read logs, get a plain-language explanation of a failed build, and manage environment variables. It uses DeployVera's hosted MCP server at `https://mcp.deployvera.com/mcp` (Streamable HTTP), listed in the official MCP Registry as `com.deployvera/mcp`. This repository also contains a Claude Code plugin with a deploy workflow skill, plus Cursor and Gemini CLI manifests.
 
-## Get a token
+## Get a token (only for token-based setups)
+
+Browser sign-in needs no token. For clients without OAuth support, or for CI, create one:
 
 1. Sign in to the [DeployVera panel](https://panel.deployvera.com).
 2. Open **Settings > AI agent access** and create a token.
@@ -15,32 +17,56 @@ Use the smallest scope set that works. A `read` token cannot change anything.
 
 ## Install
 
-### Claude Code
+### Sign in with browser (recommended)
 
-Plugin (MCP server plus the deploy skill):
+Add the server URL without any token. The client opens your browser, you sign in to DeployVera and choose the scopes and duration, and the client stores the login. Nothing to copy or paste. Connected apps are listed, and can be disconnected, in **Settings > AI agent access**.
 
-```sh
-export DEPLOYVERA_TOKEN=dvp_...
-```
+**Claude Code**: plugin (MCP server plus the deploy skill):
 
 ```
 /plugin marketplace add yusufcelalcelik/deployvera-agent
 /plugin install deployvera@deployvera
 ```
 
-Set `DEPLOYVERA_TOKEN` in the environment Claude Code is started from. Run `/mcp` to check the connection.
+Then run `/mcp`, select `deployvera` and authenticate. Or add the server only:
 
-MCP server only:
+```sh
+claude mcp add --transport http deployvera https://mcp.deployvera.com/mcp
+```
+
+**Cursor** (`~/.cursor/mcp.json`; the repository also works as a Cursor plugin with a root `mcp.json`):
+
+```json
+{
+  "mcpServers": {
+    "deployvera": { "url": "https://mcp.deployvera.com/mcp" }
+  }
+}
+```
+
+**VS Code** (`.vscode/mcp.json` or the user `mcp.json`):
+
+```json
+{
+  "servers": {
+    "deployvera": { "type": "http", "url": "https://mcp.deployvera.com/mcp" }
+  }
+}
+```
+
+**Gemini CLI**: the repository root is a Gemini CLI extension (`gemini-extension.json`) with the same URL, no token. Gemini CLI starts the browser login on the first 401 response.
+
+### With a token
+
+Use this when the client has no OAuth login, or for scripts. Create a token first (see above).
+
+**Claude Code**
 
 ```sh
 claude mcp add --transport http deployvera https://mcp.deployvera.com/mcp --header "Authorization: Bearer dvp_..."
 ```
 
-### Cursor
-
-[Add to Cursor](cursor://anysphere.cursor-deeplink/mcp/install?name=deployvera&config=eyJ1cmwiOiJodHRwczovL21jcC5kZXBsb3l2ZXJhLmNvbS9tY3AiLCJoZWFkZXJzIjp7IkF1dGhvcml6YXRpb24iOiJCZWFyZXIgWU9VUl9ERVBMT1lWRVJBX1RPS0VOIn19)
-
-The link installs a placeholder token (`YOUR_DEPLOYVERA_TOKEN`); replace it in Cursor's MCP settings after installing. Or add this to `~/.cursor/mcp.json`:
+**Cursor**: [Add to Cursor](cursor://anysphere.cursor-deeplink/mcp/install?name=deployvera&config=eyJ1cmwiOiJodHRwczovL21jcC5kZXBsb3l2ZXJhLmNvbS9tY3AiLCJoZWFkZXJzIjp7IkF1dGhvcml6YXRpb24iOiJCZWFyZXIgWU9VUl9ERVBMT1lWRVJBX1RPS0VOIn19) installs a placeholder token (`YOUR_DEPLOYVERA_TOKEN`); replace it in Cursor's MCP settings. Or in `~/.cursor/mcp.json`:
 
 ```json
 {
@@ -53,9 +79,7 @@ The link installs a placeholder token (`YOUR_DEPLOYVERA_TOKEN`); replace it in C
 }
 ```
 
-### VS Code
-
-Add to `.vscode/mcp.json` or the user `mcp.json`. VS Code asks for the token once and stores it securely.
+**VS Code**: VS Code asks for the token once and stores it securely.
 
 ```json
 {
@@ -72,9 +96,7 @@ Add to `.vscode/mcp.json` or the user `mcp.json`. VS Code asks for the token onc
 }
 ```
 
-### Codex
-
-Add to `~/.codex/config.toml` and export the token in your shell:
+**Codex** (`~/.codex/config.toml`; export the token in your shell):
 
 ```toml
 [mcp_servers.deployvera]
@@ -82,14 +104,7 @@ url = "https://mcp.deployvera.com/mcp"
 bearer_token_env_var = "DEPLOYVERA_TOKEN"
 ```
 
-### Windsurf, Gemini CLI and other clients
-
-Any client that supports remote MCP over Streamable HTTP works. Use:
-
-- URL: `https://mcp.deployvera.com/mcp`
-- Header: `Authorization: Bearer dvp_...`
-
-Check your client's documentation for where to enter a remote server URL and headers. For clients that only support stdio, use `npx -y @deployvera/mcp` with the `DEPLOYVERA_TOKEN` environment variable.
+**Windsurf and other clients**: any client that supports remote MCP over Streamable HTTP works. Use the URL `https://mcp.deployvera.com/mcp` and, for tokens, the header `Authorization: Bearer dvp_...`. For stdio-only clients use `npx -y @deployvera/mcp` with the `DEPLOYVERA_TOKEN` environment variable.
 
 ## Tools
 
@@ -115,11 +130,20 @@ Check your client's documentation for where to enter a remote server URL and hea
 - "Add DATABASE_URL to the api project and restart it." (give the value only if you are comfortable sharing it with the agent)
 - "Show the last 100 runtime log lines of my site."
 
+## Approvals
+
+Some actions need your approval in the browser, whatever the token or login scopes:
+
+- `rollback` and `delete_env_var` always require it.
+- Optionally, **approve every deploy** can be switched on for a token or login, so `deploy` requires it too.
+
+When approval is needed, the agent shows you a link on panel.deployvera.com. Open it, check what will happen, and confirm with your password and second factor. Requests expire after 10 minutes, and each approval works for one action only.
+
 ## Security
 
 - Scopes: `read`, `deploy`, `env`. A token only does what its scopes allow.
 - Environment variable values are write-only: masked in `list_env_vars`, never echoed by `set_env_vars`, scrubbed from error text. A value you type into a prompt is visible to that agent.
-- Tokens cannot create projects, change billing, domains or account settings, or reach admin routes. Use the panel for those.
+- Tokens and browser logins cannot create projects, change billing, domains or account settings, or reach admin routes. Use the panel for those.
 - Tokens expire after 30, 90 or 365 days and can be revoked at any time in **Settings > AI agent access**.
 - Rate limit: 120 requests per minute.
 - The hosted server is stateless and does not store tokens. Keep tokens out of repositories; prefer an environment variable or your client's secret prompt over a literal value in a config file.

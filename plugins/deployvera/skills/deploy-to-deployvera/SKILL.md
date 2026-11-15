@@ -22,6 +22,7 @@ Use the `deployvera` MCP tools. The token needs the `read` scope; `deploy` and `
 - Never ask the user to paste secrets into chat when an environment variable can hold them. Ask them to set the value in the panel, or in their shell environment, or use `set_env_vars` only with a value they have already given for that purpose.
 - Never print, log or echo secret values. `list_env_vars` returns keys only; values are write-only.
 - Confirm with the user before `rollback` and before `delete_env_var`. State what will change (build or key name) and wait for a yes.
+- If a tool answers that approval is required, show the user the approval link, wait for them to approve it in the browser, then repeat the same call (pass `approval_id` if the tool accepts it). Never try to work around an approval.
 - Use `cancel_build` only when the user asks or a build is clearly stuck on an outdated commit.
 - Use `set_env_vars` with `apply` only when a restart is intended; mention that it restarts the app.
 - Do not invent project ids, build ids or URLs. Take them from tool output.

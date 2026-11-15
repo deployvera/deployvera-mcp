@@ -2,10 +2,7 @@
   "mcpServers": {
     "deployvera": {
       "type": "http",
-      "url": "https://mcp.deployvera.com/mcp",
-      "headers": {
-        "Authorization": "Bearer ${DEPLOYVERA_TOKEN}"
-      }
+      "url": "https://mcp.deployvera.com/mcp"
     }
   }
 }
