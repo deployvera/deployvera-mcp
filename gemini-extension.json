@@ -1,7 +1,7 @@
 {
   "name": "deployvera",
-  "version": "0.2.0",
-  "description": "Deploy, follow builds, read logs, fix failures and manage environment variables of your existing DeployVera projects.",
+  "version": "0.4.0",
+  "description": "Deploy, follow builds, read logs, fix failures, check managed databases and manage environment variables of your existing DeployVera projects.",
   "mcpServers": {
     "deployvera": {
       "httpUrl": "https://mcp.deployvera.com/mcp"

@@ -4,7 +4,7 @@
 
 <img src="assets/logo.png" alt="DeployVera" width="96" align="right">
 
-Connect coding agents (Claude Code, Cursor, VS Code, Codex and any other MCP client) to your existing [DeployVera](https://deployvera.com) projects. The agent can list projects, deploy, follow builds, read logs, get a plain-language explanation of a failed build, and manage environment variables. It uses DeployVera's hosted MCP server at `https://mcp.deployvera.com/mcp` (Streamable HTTP), listed in the official MCP Registry as `com.deployvera/mcp`. This repository also contains a Claude Code plugin with a deploy workflow skill, plus Cursor and Gemini CLI manifests.
+Connect coding agents (Claude Code, Cursor, VS Code, Codex and any other MCP client) to your existing [DeployVera](https://deployvera.com) projects. The agent can list projects, deploy, follow builds, read logs, get a plain-language explanation of a failed build, check managed databases, and manage environment variables. It uses DeployVera's hosted MCP server at `https://mcp.deployvera.com/mcp` (Streamable HTTP), listed in the official MCP Registry as `com.deployvera/mcp`. This repository also contains a Claude Code plugin with a deploy workflow skill, plus Cursor and Gemini CLI manifests.
 
 ## Get a token (only for token-based setups)
 
@@ -36,7 +36,9 @@ Then run `/mcp`, select `deployvera` and authenticate. Or add the server only:
 claude mcp add --transport http deployvera https://mcp.deployvera.com/mcp
 ```
 
-**Cursor** (`~/.cursor/mcp.json`; the repository also works as a Cursor plugin with a root `mcp.json`):
+**Cursor**: [![Add to Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=deployvera&config=eyJ1cmwiOiJodHRwczovL21jcC5kZXBsb3l2ZXJhLmNvbS9tY3AifQ%3D%3D)
+
+One click adds the server; Cursor then opens the DeployVera sign-in. Or add it to `~/.cursor/mcp.json` (the repository also works as a Cursor plugin with a root `mcp.json`):
 
 ```json
 {
@@ -68,7 +70,7 @@ Use this when the client has no OAuth login, or for scripts. Create a token firs
 claude mcp add --transport http deployvera https://mcp.deployvera.com/mcp --header "Authorization: Bearer dvp_..."
 ```
 
-**Cursor**: [Add to Cursor](cursor://anysphere.cursor-deeplink/mcp/install?name=deployvera&config=eyJ1cmwiOiJodHRwczovL21jcC5kZXBsb3l2ZXJhLmNvbS9tY3AiLCJoZWFkZXJzIjp7IkF1dGhvcml6YXRpb24iOiJCZWFyZXIgWU9VUl9ERVBMT1lWRVJBX1RPS0VOIn19) installs a placeholder token (`YOUR_DEPLOYVERA_TOKEN`); replace it in Cursor's MCP settings. Or in `~/.cursor/mcp.json`:
+**Cursor**: [Add to Cursor](https://cursor.com/install-mcp?name=deployvera&config=eyJ1cmwiOiJodHRwczovL21jcC5kZXBsb3l2ZXJhLmNvbS9tY3AiLCJoZWFkZXJzIjp7IkF1dGhvcml6YXRpb24iOiJCZWFyZXIgWU9VUl9ERVBMT1lWRVJBX1RPS0VOIn19) installs a placeholder token (`YOUR_DEPLOYVERA_TOKEN`); replace it in Cursor's MCP settings. Or in `~/.cursor/mcp.json`:
 
 ```json
 {
@@ -113,7 +115,9 @@ bearer_token_env_var = "DEPLOYVERA_TOKEN"
 | Tool | Scope | What it does |
 |------|-------|--------------|
 | `list_projects` | read | Projects with status, live URL, repo/branch, last build |
-| `get_project` | read | Details, latest build, and whether the live commit is behind the branch |
+| `get_project` | read | Details, latest build, managed databases, and whether the live commit is behind the branch |
+| `list_databases` | read | Managed databases with engine, status and project. No credentials or connection strings |
+| `get_database_logs` | read | Tail (default 100, max 500) of a database's sanitized operational log |
 | `get_build` | read | Build status (latest by default); `wait_seconds` (0-120) polls until it ends |
 | `get_build_logs` | read | Tail (default 200, max 1000) of the sanitized build log, or runtime log |
 | `explain_build_failure` | read | Reason code, plain-English cause, fix steps and the last log lines |
@@ -123,6 +127,7 @@ bearer_token_env_var = "DEPLOYVERA_TOKEN"
 | `deploy` | deploy | Deploy the branch head, or a specific `commit_sha`; returns the build id |
 | `rollback` | deploy | Redeploy the retained image of an earlier build |
 | `cancel_build` | deploy | Cancel a queued or running build |
+| `check_approval` | any | Status of an approval request. It cannot approve anything |
 
 ## Example prompts
 
@@ -131,6 +136,7 @@ bearer_token_env_var = "DEPLOYVERA_TOKEN"
 - "Which of my projects is behind its branch?"
 - "Add DATABASE_URL to the api project and restart it." (give the value only if you are comfortable sharing it with the agent)
 - "Show the last 100 runtime log lines of my site."
+- "Are my databases running? Show the Postgres log if one is not."
 
 ## Approvals
 
