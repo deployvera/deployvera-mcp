@@ -1,5 +1,7 @@
 # DeployVera for AI agents
 
+[![mcptry](https://mcptry.com/badge/com.deployvera/mcp)](https://mcptry.com/servers/com.deployvera/mcp)
+
 <img src="assets/logo.png" alt="DeployVera" width="96" align="right">
 
 Connect coding agents (Claude Code, Cursor, VS Code, Codex and any other MCP client) to your existing [DeployVera](https://deployvera.com) projects. The agent can list projects, deploy, follow builds, read logs, get a plain-language explanation of a failed build, and manage environment variables. It uses DeployVera's hosted MCP server at `https://mcp.deployvera.com/mcp` (Streamable HTTP), listed in the official MCP Registry as `com.deployvera/mcp`. This repository also contains a Claude Code plugin with a deploy workflow skill, plus Cursor and Gemini CLI manifests.
