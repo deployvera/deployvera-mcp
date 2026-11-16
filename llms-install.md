@@ -22,7 +22,7 @@ The endpoint uses Streamable HTTP. On first use the client opens a browser windo
 
 ## 2. If the client cannot do OAuth
 
-Ask the user to create a token in the DeployVera panel (https://panel.deployvera.com > Settings > AI agent access). Tokens start with `dvp_`. Never invent or guess a token. Then add it as a header:
+Ask the user to create a token in the DeployVera panel (https://deployvera.com/clientarea/settings > AI agent access). Tokens start with `dvp_`. Never invent or guess a token. Then add it as a header:
 
 ```json
 {

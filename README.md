@@ -8,7 +8,7 @@ Connect coding agents (Claude Code, Cursor, VS Code, Codex and any other MCP cli
 
 Browser sign-in needs no token. For clients without OAuth support, or for CI, create one:
 
-1. Sign in to the [DeployVera panel](https://panel.deployvera.com).
+1. Sign in to the [DeployVera panel](https://deployvera.com/clientarea).
 2. Open **Settings > AI agent access** and create a token.
 3. Pick the scopes (`read`, `deploy`, `env`) and a lifetime (30, 90 or 365 days).
 4. Copy the token (`dvp_...`). It is shown once.
@@ -137,7 +137,7 @@ Some actions need your approval in the browser, whatever the token or login scop
 - `rollback` and `delete_env_var` always require it.
 - Optionally, **approve every deploy** can be switched on for a token or login, so `deploy` requires it too.
 
-When approval is needed, the agent shows you a link on panel.deployvera.com. Open it, check what will happen, and confirm with your password and second factor. Requests expire after 10 minutes, and each approval works for one action only.
+When approval is needed, the agent shows you a link that opens on `https://deployvera.com/approve/…`. Check that the address bar shows `deployvera.com` before you enter your password. Then check what will happen and confirm with your password and second factor. Requests expire after 10 minutes, and each approval works for one action only.
 
 ## Security
 
@@ -151,7 +151,7 @@ When approval is needed, the agent shows you a link on panel.deployvera.com. Ope
 ## Links
 
 - Website: <https://deployvera.com>
-- Panel: <https://panel.deployvera.com>
+- Panel: <https://deployvera.com/clientarea>
 - Documentation: <https://deployvera.com/docs/en/quickstart>
 - Privacy policy: <https://deployvera.com/legal/privacy-policy>
 - Terms of service: <https://deployvera.com/legal/terms-of-service>

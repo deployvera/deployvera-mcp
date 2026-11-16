@@ -9,7 +9,7 @@ Use the `deployvera` MCP tools. The user signs in to DeployVera in the browser w
 
 ## Workflow
 
-1. **Find the project.** Call `list_projects`, then `get_project` for the one that matches this repository (repo URL and branch). If none matches, stop and tell the user: new projects must be created in the DeployVera panel (panel.deployvera.com); tokens cannot create projects, change billing, domains or account settings.
+1. **Find the project.** Call `list_projects`, then `get_project` for the one that matches this repository (repo URL and branch). If none matches, stop and tell the user: new projects must be created in the DeployVera panel (deployvera.com/clientarea); tokens cannot create projects, change billing, domains or account settings.
 2. **Check the state.** `get_project` shows the latest build and whether the live commit is behind the branch. If it is not behind and nothing changed, say so instead of redeploying.
 3. **Commit and push.** Make sure the working tree is committed and pushed to the project's branch. Do not commit secrets or `.env` files.
 4. **Deploy.** Call `deploy` (optionally with `commit_sha`). Keep the returned build id.
