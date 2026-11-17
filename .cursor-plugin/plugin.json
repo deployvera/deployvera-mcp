@@ -1,7 +1,7 @@
 {
   "name": "deployvera",
-  "description": "Deploy, follow builds, read logs, fix failures, check managed databases and manage environment variables of your existing DeployVera projects.",
-  "version": "0.4.0",
+  "description": "Create projects, deploy, follow builds, read logs, fix failures, connect domains, check managed databases and manage environment variables of your DeployVera projects.",
+  "version": "0.5.0",
   "author": {
     "name": "DeployVera"
   },

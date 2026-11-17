@@ -4,7 +4,7 @@
 
 <img src="assets/logo.png" alt="DeployVera" width="96" align="right">
 
-Connect coding agents (Claude Code, Cursor, VS Code, Codex and any other MCP client) to your existing [DeployVera](https://deployvera.com) projects. The agent can list projects, deploy, follow builds, read logs, get a plain-language explanation of a failed build, check managed databases, and manage environment variables. It uses DeployVera's hosted MCP server at `https://mcp.deployvera.com/mcp` (Streamable HTTP), listed in the official MCP Registry as `com.deployvera/mcp`. This repository also contains a Claude Code plugin with a deploy workflow skill, plus Cursor and Gemini CLI manifests.
+Connect coding agents (Claude Code, Cursor, VS Code, Codex and any other MCP client) to your existing [DeployVera](https://deployvera.com) projects. The agent can list projects, deploy, follow builds, read logs, get a plain-language explanation of a failed build, check managed databases, manage environment variables, create new projects and connect custom domains (both with browser approval). It uses DeployVera's hosted MCP server at `https://mcp.deployvera.com/mcp` (Streamable HTTP), listed in the official MCP Registry as `com.deployvera/mcp`. This repository also contains a Claude Code plugin with a deploy workflow skill, plus Cursor and Gemini CLI manifests.
 
 ## Get a token (only for token-based setups)
 
@@ -114,20 +114,31 @@ bearer_token_env_var = "DEPLOYVERA_TOKEN"
 
 | Tool | Scope | What it does |
 |------|-------|--------------|
+| `list_services` | read | Your own services with plan, status, app quota, apps used and free slots. Shared services are not included |
+| `list_repositories` | read | Repositories you can deploy from connected GitHub/GitLab (and Gitea where enabled): provider, full name, URL, default branch, private flag. No tokens |
 | `list_projects` | read | Projects with status, live URL, repo/branch, last build |
-| `get_project` | read | Details, latest build, managed databases, and whether the live commit is behind the branch |
-| `list_databases` | read | Managed databases with engine, status and project. No credentials or connection strings |
-| `get_database_logs` | read | Tail (default 100, max 500) of a database's sanitized operational log |
-| `get_build` | read | Build status (latest by default); `wait_seconds` (0-120) polls until it ends |
-| `get_build_logs` | read | Tail (default 200, max 1000) of the sanitized build log, or runtime log |
-| `explain_build_failure` | read | Reason code, plain-English cause, fix steps and the last log lines |
-| `list_env_vars` | env | Keys and flags only. Values are never returned |
-| `set_env_vars` | env | Bulk set `{KEY: value}`; optional `build_time` and `apply` (restart) |
-| `delete_env_var` | env | Delete a variable by key |
-| `deploy` | deploy | Deploy the branch head, or a specific `commit_sha`; returns the build id |
-| `rollback` | deploy | Redeploy the retained image of an earlier build |
+| `get_project` | read | Details, latest build, and whether the live commit is behind the branch |
+| `check_domain` | read | Whether a custom domain is attached and whether each name currently points to the project (live DNS lookup) |
+| `get_build` | read | Build status (latest by default); `wait_seconds` (0-120) polls every 5 s until it ends |
+| `list_databases` | read | Managed databases (id, name, engine, status, project). Never connection details or credentials |
+| `get_database_logs` | read | Tail (default 100, max 500) of a managed database's sanitized operational log |
+| `get_build_logs` | read | Tail (default 200, max 1000) of the sanitized build log, or `source: "runtime"` |
+| `explain_build_failure` | read | Reason code, plain-English cause, concrete fix steps and the last ~40 log lines |
+| `list_env_vars` | env | Keys and flags only (build-time, multiline). Values are never returned |
+| `set_env_vars` | env | Bulk set `{KEY: value}`; optional `build_time`, `apply` (restart). Values are never echoed |
+| `delete_env_var` | env | Delete by key; always needs approval, optional `approval_id` |
+| `deploy` | deploy | Deploy the branch head, or a specific `commit_sha`; returns the build id; optional `approval_id` |
+| `rollback` | deploy | Redeploy the retained image of an earlier build; always needs approval, optional `approval_id` |
 | `cancel_build` | deploy | Cancel a queued or running build |
-| `check_approval` | any | Status of an approval request. It cannot approve anything |
+| `create_project` | deploy | Create a project in one of your own services from a Git repository (`service_id`, `repo_url`, `source`, `branch`; optional `name`, `port`, `build_method`, `root_directory`); always needs approval. No env values: use `set_env_vars` afterwards |
+| `start_domain_verification` | deploy | Returns the DNS records (TXT ownership challenge plus CNAME/A) the user must create for a custom domain; changes no routing, no approval |
+| `set_domain` | deploy | Attaches the domain once DNS is verified (otherwise an error to retry after propagation); always needs approval |
+| `remove_domain` | deploy | Detaches the custom domain; always needs approval |
+| `check_approval` | read | Status of an approval request (pending, approved, denied, expired, used) |
+
+New project and domain: `list_services` (a service with a free slot; ordering a plan stays in the panel) -> `list_repositories` -> `create_project` (approval) -> `set_env_vars` -> `deploy` / `get_build` -> `start_domain_verification` -> create the DNS records -> `set_domain` (approval) -> `check_domain`.
+
+Typical flow after pushing code: `deploy`, then `get_build` with `wait_seconds=120`. If it fails: `explain_build_failure`, fix, push, repeat.
 
 ## Example prompts
 
@@ -142,7 +153,7 @@ bearer_token_env_var = "DEPLOYVERA_TOKEN"
 
 Some actions need your approval in the browser, whatever the token or login scopes:
 
-- `rollback` and `delete_env_var` always require it.
+- `create_project`, `set_domain`, `remove_domain`, `rollback` and `delete_env_var` always require it.
 - Optionally, **approve every deploy** can be switched on for a token or login, so `deploy` requires it too.
 
 When approval is needed, the agent shows you a link that opens on `https://deployvera.com/approve/…`. Check that the address bar shows `deployvera.com` before you enter your password. Then check what will happen and confirm with your password and second factor. Requests expire after 10 minutes, and each approval works for one action only.
@@ -151,7 +162,7 @@ When approval is needed, the agent shows you a link that opens on `https://deplo
 
 - Scopes: `read`, `deploy`, `env`. A token only does what its scopes allow.
 - Environment variable values are write-only: masked in `list_env_vars`, never echoed by `set_env_vars`, scrubbed from error text. A value you type into a prompt is visible to that agent.
-- Tokens and browser logins cannot create projects, change billing, domains or account settings, or reach admin routes. Use the panel for those.
+- Tokens and browser logins cannot buy or change plans, make payments, change billing or account settings, or reach admin routes. Creating a project and connecting a domain are possible but always need browser approval.
 - Tokens expire after 30, 90 or 365 days and can be revoked at any time in **Settings > AI agent access**.
 - Rate limit: 120 requests per minute.
 - The hosted server is stateless and does not store tokens. Keep tokens out of repositories; prefer an environment variable or your client's secret prompt over a literal value in a config file.
