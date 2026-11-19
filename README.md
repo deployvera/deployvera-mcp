@@ -12,7 +12,7 @@ Browser sign-in needs no token. For clients without OAuth support, or for CI, cr
 
 1. Sign in to the [DeployVera panel](https://deployvera.com/clientarea).
 2. Open **Settings > AI agent access** and create a token.
-3. Pick the scopes (`read`, `deploy`, `env`) and a lifetime (30, 90 or 365 days).
+3. Pick the scopes (`read`, `deploy`, `env`, `support`) and a lifetime (30, 90 or 365 days).
 4. Copy the token (`dvp_...`). It is shown once.
 
 Use the smallest scope set that works. A `read` token cannot change anything.
@@ -135,6 +135,7 @@ bearer_token_env_var = "DEPLOYVERA_TOKEN"
 | `set_domain` | deploy | Attaches the domain once DNS is verified (otherwise an error to retry after propagation); always needs approval |
 | `remove_domain` | deploy | Detaches the custom domain; always needs approval |
 | `check_approval` | read | Status of an approval request (pending, approved, denied, expired, used) |
+| `report_to_deployvera` | support | Send a detailed issue or product suggestion to the DeployVera support inbox, optionally with a project and related links |
 
 New project and domain: `list_services` (a service with a free slot; ordering a plan stays in the panel) -> `list_repositories` -> `create_project` (approval) -> `set_env_vars` -> `deploy` / `get_build` -> `start_domain_verification` -> create the DNS records -> `set_domain` (approval) -> `check_domain`.
 
@@ -160,7 +161,7 @@ When approval is needed, the agent shows you a link that opens on `https://deplo
 
 ## Security
 
-- Scopes: `read`, `deploy`, `env`. A token only does what its scopes allow.
+- Scopes: `read`, `deploy`, `env`, `support`. A token only does what its scopes allow. Reporting an issue or suggestion requires the separate `support` scope.
 - Environment variable values are write-only: masked in `list_env_vars`, never echoed by `set_env_vars`, scrubbed from error text. A value you type into a prompt is visible to that agent.
 - Tokens and browser logins cannot buy or change plans, make payments, change billing or account settings, or reach admin routes. Creating a project and connecting a domain are possible but always need browser approval.
 - Tokens expire after 30, 90 or 365 days and can be revoked at any time in **Settings > AI agent access**.
